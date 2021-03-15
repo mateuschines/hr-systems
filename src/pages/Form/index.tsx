@@ -1,6 +1,10 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { PageHeader, Button, Form, Input } from 'antd'
-import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom'
+
+import VMasker from 'vanilla-masker'
+
+import axios from 'axios'
 
 const layout = {
     labelCol: { span: 0 },
@@ -11,28 +15,48 @@ const PageForm: React.FC = () => {
 
     const [form] = Form.useForm();
 
-    const [salary, setSalary] = useState<any>([]);
-
     const history = useHistory();
 
     const onChangeSalary = useCallback((e: any) => {
         const value = e.target.value;
-        const regex = /^[0-9\.\,0-9]*$/
 
-        if (regex.test(value)) {
-            setSalary(value)
-            form.setFieldsValue(
-                { salary: value }
-            );
-        } else {
-            form.setFieldsValue(
-                { salary: salary }
-            );
-        }
-    }, [salary]);
+        let valueMask = VMasker.toMoney(value, {
+            // Decimal precision -> "90"
+            precision: 2,
+
+            // Decimal separator -> ",90"
+            separator: '.',
+
+            // Number delimiter -> "12.345.678"
+            delimiter: ',',
+
+            // Money unit -> "R$ 12.345.678,90"
+            unit: '$',
+
+        });
+        
+        form.setFieldsValue(
+            { salary: valueMask }
+        );
+
+    }, []);
 
     const onFinish = useCallback((values: any) => {
-        console.log(values);
+
+        values.salary = VMasker.toNumber(values.salary);
+
+        const request = async () => {
+            try {
+                await axios.post("http://localhost:3333/employees", values);
+
+                history.push("/");
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        request();
     }, []);
 
     const onReset = useCallback(() => {

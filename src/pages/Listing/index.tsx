@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { PageHeader, Button, Table, Space, Typography } from 'antd'
-import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom'
 
-// import axios from 'axios';
+import axios from 'axios'
 
 import './style.css';
 
@@ -16,40 +16,18 @@ const Listing: React.FC = () => {
 
     useEffect((): void => {
 
-        setData([{
-            key: '1',
-            firstName: 'John',
-            lastName: 'Brown',
-            salary: '30000',
-            taxAmount: '2242.0'
-        },
-        {
-            key: '2',
-            firstName: 'Jim',
-            lastName: 'Green',
-            salary: '25000',
-            taxAmount: '1242.0'
-        },
-        {
-            key: '3',
-            firstName: 'Joe',
-            lastName: 'Black',
-            salary: '35000',
-            taxAmount: '3242.0'
-        }])
+        const request = async () => {
+            try {
+                let result = await axios.get("http://localhost:3333/employees");
 
-        // const request = async () => {
-        //     try {
-        //         let result = await axios.get("urlApi", dados);
+                setData(result.data)
 
-        //         setData(result.data)
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
-        //     } catch (error) {
-        //         console.log(error);
-        //     }
-        // }
-
-        // buscaDeDados();
+        request();
     }, []);
 
     const onClick = useCallback((): void => {
@@ -61,14 +39,28 @@ const Listing: React.FC = () => {
     }, [history]);
 
     const onClickDelete = useCallback((record: any): void => {
-        console.log(record)
+
+        const request = async () => {
+            try {
+                await axios.delete("http://localhost:3333/employees/"+record.id);
+
+                let result = await axios.get("http://localhost:3333/employees");
+
+                setData(result.data)
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        request();
     }, [history]);
 
     const columns = [
         {
             title: 'Employee ID',
-            dataIndex: 'key',
-            key: 'key',
+            dataIndex: 'id',
+            key: 'id',
         },
         {
             title: 'First Name',
@@ -93,8 +85,9 @@ const Listing: React.FC = () => {
             title: 'Delete',
             key: 'delete',
             render: (text: any, record: any) => (
-                <Space size="middle">
-                    <Button onClick={() => onClickDelete(record)} type="link">Delete and Create</Button>
+                <Space style={{marginRight: 0}}>
+                    <Button onClick={() => onClickDelete(record)} type="link">Delete and</Button>
+                    <Button style={{marginLeft: -34}} onClick={() => onClick()} type="link">Create</Button>
                 </Space>
             ),
         },
@@ -112,7 +105,7 @@ const Listing: React.FC = () => {
                 <Button style={{ marginBottom: 20 }} onClick={onClick} type="primary">PLEASE CREATE YOUR PROFILE</Button>
 
                 <Title level={3}>Your Details</Title>
-                <Table columns={columns} dataSource={data} />
+                <Table  columns={columns} rowKey={(record) => record.id} dataSource={data} />
             </div>
         </>
     );

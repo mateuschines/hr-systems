@@ -32,7 +32,7 @@ const Details: React.FC = (props: any) => {
                     <Button style={{ marginBottom: 20 }} onClick={onClick} type="primary">BACK</Button>
 
                     <Text strong>Employee ID:</Text>
-                    <Text>{data ? data?.key : ''}</Text>
+                    <Text>{data ? data?.id : ''}</Text>
 
                     <Text strong>First Name:</Text>
                     <Text>{data ? data?.firstName : ''}</Text>
@@ -44,7 +44,7 @@ const Details: React.FC = (props: any) => {
                     <Text>{data ? data?.salary : ''}</Text>
 
                     <Text strong>Tax Amount:</Text>
-                    <Text>{data ? data?.taxAmount : ''}</Text>
+                    <Text>{data ? data?.tax_amount : ''}</Text>
 
                 </Space>
             </div>
